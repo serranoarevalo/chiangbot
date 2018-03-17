@@ -1,2 +1,3 @@
-# chiangbot
+# Chiangbot
+
 Messenger Bot that helps you plan a trip to Chiang Mai

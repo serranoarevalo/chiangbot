@@ -1,0 +1,10 @@
+{
+  "name": "chiangbot",
+  "version": "1.0.0",
+  "description": "Messenger Bot that helps you plan a trip to Chiang Mai",
+  "main": "src/server.js",
+  "repository": "https://github.com/serranoarevalo/chiangbot",
+  "author": "Nicolás Serrano Arévalo <itnico.las.me@gmail.com>",
+  "license": "MIT",
+  "private": false
+}
