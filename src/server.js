@@ -1,4 +1,5 @@
 const express = require("express"),
+  axios = require("axios"),
   bodyParser = require("body-parser"),
   morgan = require("morgan"),
   messages = require("./messages"),
@@ -9,7 +10,7 @@ const express = require("express"),
 const { welcomeButtons } = buttons;
 const { PLAN_TRIP, PLANE_TICKET } = constants;
 const { sendMessageWithOptions, sendMessage } = messages;
-const { getUserProfile, markSeen, typingOff, typingOn } = utils;
+const { getUserProfile, markSeen, typingOff, typingOn, getFlights } = utils;
 
 const app = express();
 
@@ -53,9 +54,9 @@ app
             const userInfo = userInfoRequest.data;
             if ("postback" in webhook_event) {
               const { postback } = webhook_event;
+              typingOn(senderId);
               switch (postback.payload) {
                 case "Start":
-                  typingOn(senderId);
                   sendMessage(
                     senderId,
                     `Hello ${
@@ -70,12 +71,40 @@ app
                     );
                     typingOff(senderId);
                   }, 1500);
+                  break;
                 case PLAN_TRIP:
                   sendMessage(senderId, "");
+                  break;
+                case PLANE_TICKET:
+                  sendMessage(
+                    senderId,
+                    "I can only buy tickets with one 10 days in advance so I'm gonna show a list of tickets with their price"
+                  );
+                  typingOn(senderId);
+                  const flightReq = await getFlights();
+                  typingOff(senderId);
+                  const flightData = "";
+                  const { data: { data } } = flightReq;
+                  data.forEach(flight => {
+                    const departureTime = flight.dTimeUTC;
+                    let date = new Date();
+                    date = date.setSeconds(departureTime);
+                    date = `${date.getUTCDate()}/${date.getUTCMonth()}`;
+                    const string = `${date} \n`;
+                    flightData.concat(string);
+                    console.log(flight);
+                  });
+                  sendMessage(senderId, flightData);
+                  break;
               }
             } else if ("message" in webhook_event) {
-              console.log("talking to", userInfo.first_name);
+              const dadReq = await axios.get("https://icanhazdadjoke.com/", {
+                headers: { Accept: "application/json" }
+              });
+              typingOn(senderId);
+              console.log(dadReq);
               typingOff(senderId);
+              sendMessage(senderId, dadReq.data.joke);
             }
           }
         }
