@@ -1,9 +1,7 @@
 const request = require("request"),
   axios = require("axios"),
-  constants = require("./constants"),
   secrets = require("../keys.secret");
 
-const { PLAN_TRIP, PLANE_TICKET } = constants;
 const { TOKEN } = secrets;
 
 const sendMessage = (sender, text) => {
@@ -30,7 +28,7 @@ const sendMessage = (sender, text) => {
   );
 };
 
-const sendWelcome = id => {
+const sendMessageWithOptions = (id, message, buttons) => {
   axios.post(
     `https://graph.facebook.com/v2.6/me/messages?access_token=${TOKEN}`,
     {
@@ -42,19 +40,8 @@ const sendWelcome = id => {
           type: "template",
           payload: {
             template_type: "button",
-            text: `How can I help you today?`,
-            buttons: [
-              {
-                type: "postback",
-                title: "Plan trip (✈️ + 🏨)",
-                payload: PLAN_TRIP
-              },
-              {
-                type: "postback",
-                title: "Get plane ticket ✈️",
-                payload: PLANE_TICKET
-              }
-            ]
+            text: message,
+            buttons: buttons
           }
         }
       }
@@ -63,6 +50,6 @@ const sendWelcome = id => {
 };
 
 module.exports = {
-  sendMessage,
-  sendWelcome
+  sendMessageWithOptions,
+  sendMessage
 };

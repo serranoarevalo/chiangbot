@@ -3,10 +3,12 @@ const express = require("express"),
   morgan = require("morgan"),
   messages = require("./messages"),
   constants = require("./constants"),
+  buttons = require("./buttons"),
   utils = require("./utils");
 
+const { welcomeButtons } = buttons;
 const { PLAN_TRIP, PLANE_TICKET } = constants;
-const { sendMessage, sendWelcome } = messages;
+const { sendMessageWithOptions, sendMessage } = messages;
 const { getUserProfile, markSeen, typingOff, typingOn } = utils;
 
 const app = express();
@@ -61,7 +63,11 @@ app
                     } I'm Chaingbot, your personal concierge for your next trip to Chiang Mai,`
                   );
                   setTimeout(() => {
-                    sendWelcome(senderId);
+                    sendMessageWithOptions(
+                      senderId,
+                      "How can I help you today?",
+                      welcomeButtons
+                    );
                     typingOff(senderId);
                   }, 1500);
                 case PLAN_TRIP:
