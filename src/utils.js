@@ -1,7 +1,7 @@
 const axios = require("axios"),
   secrets = require("../keys.secret");
 
-const { TOKEN } = secrets;
+const { TOKEN, BITLY_TOKEN } = secrets;
 
 const getUserProfile = id =>
   axios.get(
@@ -51,16 +51,22 @@ const getFlights = () => {
   const days = requiredDate.getUTCDate();
   const month = requiredDate.getUTCMonth() + 1;
   const year = requiredDate.getUTCFullYear();
-  const dateString = `${days}%2F${month < 10 ? "0" + month : month}%2F${year}`;
+  const dateString = `${days}%2F${month < 10 ? `0${month}` : month}%2F${year}`;
   return axios.get(
-    `https://api.skypicker.com/flights?flyFrom=ICN&to=CNX&typeFlight=round&curr=KRW&dateTo=${dateString}`
+    `https://api.skypicker.com/flights?flyFrom=ICN&to=CNX&typeFlight=round&curr=KRW&dateTo=${dateString}&limit=10`
   );
 };
+
+const shortenURL = longURL =>
+  axios.get(
+    `https://api-ssl.bitly.com/v3/shorten?access_token=${BITLY_TOKEN}&longUrl=${longURL}`
+  );
 
 module.exports = {
   getUserProfile,
   typingOn,
   typingOff,
   markSeen,
-  getFlights
+  getFlights,
+  shortenURL
 };

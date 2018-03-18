@@ -10,7 +10,14 @@ const express = require("express"),
 const { welcomeButtons } = buttons;
 const { PLAN_TRIP, PLANE_TICKET } = constants;
 const { sendMessageWithOptions, sendMessage } = messages;
-const { getUserProfile, markSeen, typingOff, typingOn, getFlights } = utils;
+const {
+  getUserProfile,
+  markSeen,
+  typingOff,
+  typingOn,
+  getFlights,
+  shortenURL
+} = utils;
 
 const app = express();
 
@@ -76,25 +83,34 @@ app
                   sendMessage(senderId, "");
                   break;
                 case PLANE_TICKET:
+                  const flightReq = await getFlights();
+                  const { data: { data } } = flightReq;
+                  let flightData = "";
+                  data.forEach(async flight => {
+                    const departureTime = flight.dTimeUTC;
+
+                    let date = new Date();
+                    date.setSeconds(departureTime);
+                    dateString = `${
+                      date.getUTCDate() < 10
+                        ? `0${date.getUTCDate()}`
+                        : date.getUTCDate()
+                    }/${
+                      date.getUTCMonth() < 10
+                        ? `0${date.getUTCMonth()}`
+                        : date.getUTCMonth()
+                    }`;
+                    flightData =
+                      flightData +
+                      `ICN🇰🇷 -> CNX🇹🇭 ${dateString} 💵${
+                        flight.conversion.KRW
+                      } \n`;
+                  });
+                  console.log(flightData);
                   sendMessage(
                     senderId,
-                    "I can only buy tickets with one 10 days in advance so I'm gonna show a list of tickets with their price"
+                    `I found the following flights \n${flightData}`
                   );
-                  typingOn(senderId);
-                  const flightReq = await getFlights();
-                  typingOff(senderId);
-                  const flightData = "";
-                  const { data: { data } } = flightReq;
-                  data.forEach(flight => {
-                    const departureTime = flight.dTimeUTC;
-                    let date = new Date();
-                    date = date.setSeconds(departureTime);
-                    date = `${date.getUTCDate()}/${date.getUTCMonth()}`;
-                    const string = `${date} \n`;
-                    flightData.concat(string);
-                    console.log(flight);
-                  });
-                  sendMessage(senderId, flightData);
                   break;
               }
             } else if ("message" in webhook_event) {
