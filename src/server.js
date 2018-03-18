@@ -86,7 +86,7 @@ app
                   const flightReq = await getFlights();
                   const { data: { data } } = flightReq;
                   let flightData = "";
-                  data.forEach(async flight => {
+                  data.forEach(async (flight, index) => {
                     const departureTime = flight.dTimeUTC;
 
                     let date = new Date();
@@ -100,17 +100,21 @@ app
                         ? `0${date.getUTCMonth()}`
                         : date.getUTCMonth()
                     }`;
+                    const shortUrl = await shortenURL(
+                      `https://www.kiwi.com/en/booking?token=${
+                        flight.booking_token
+                      }`
+                    );
                     flightData =
                       flightData +
-                      `ICN🇰🇷 -> CNX🇹🇭 ${dateString} 💵${
+                      `ICN🇰🇷 -> CNX🇹🇭 ${dateString} 💲${
                         flight.conversion.KRW
-                      } \n`;
+                      } Book -> ${shortUrl.data.data.url} \n`;
+                    console.log(index);
+                    if (index === 9) {
+                      sendMessage(senderId, flightData);
+                    }
                   });
-                  console.log(flightData);
-                  sendMessage(
-                    senderId,
-                    `I found the following flights \n${flightData}`
-                  );
                   break;
               }
             } else if ("message" in webhook_event) {
@@ -118,7 +122,6 @@ app
                 headers: { Accept: "application/json" }
               });
               typingOn(senderId);
-              console.log(dadReq);
               typingOff(senderId);
               sendMessage(senderId, dadReq.data.joke);
             }

@@ -52,15 +52,18 @@ const getFlights = () => {
   const month = requiredDate.getUTCMonth() + 1;
   const year = requiredDate.getUTCFullYear();
   const dateString = `${days}%2F${month < 10 ? `0${month}` : month}%2F${year}`;
-  return axios.get(
-    `https://api.skypicker.com/flights?flyFrom=ICN&to=CNX&typeFlight=round&curr=KRW&dateTo=${dateString}&limit=10`
-  );
+  return axios
+    .get(
+      `https://api.skypicker.com/flights?flyFrom=ICN&to=CNX&typeFlight=round&curr=KRW&dateTo=${dateString}&limit=10`
+    )
+    .catch(() => console.log("error"));
 };
 
-const shortenURL = longURL =>
-  axios.get(
+const shortenURL = async longURL => {
+  return axios.get(
     `https://api-ssl.bitly.com/v3/shorten?access_token=${BITLY_TOKEN}&longUrl=${longURL}`
   );
+};
 
 module.exports = {
   getUserProfile,
